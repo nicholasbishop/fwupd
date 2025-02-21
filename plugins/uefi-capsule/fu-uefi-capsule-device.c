@@ -466,6 +466,11 @@ fu_uefi_capsule_device_check_asset(FuUefiCapsuleDevice *self, GError **error)
 
 	if (!fu_efivars_get_secure_boot(efivars, &secureboot_enabled, error))
 		return FALSE;
+
+	/* if fwupd-efi isn't in use, skip checks for the signed binary */
+	if (!fu_device_has_private_flag(FU_DEVICE(self), FU_UEFI_CAPSULE_DEVICE_FLAG_USE_FWUPD_EFI))
+		return TRUE;
+
 	source_app = fu_uefi_get_built_app_path(efivars, "fwupd", error);
 	if (source_app == NULL && secureboot_enabled) {
 		g_prefix_error(error, "missing signed bootloader for secure boot: ");
@@ -507,6 +512,28 @@ fu_uefi_capsule_device_cleanup(FuDevice *device,
 	g_clear_object(&priv->esp_locker);
 
 	return TRUE;
+}
+
+static gboolean
+fu_uefi_capsule_device_bootloader_supports_fwupd(FuDevice *device)
+{
+	FuContext *ctx = fu_device_get_context(device);
+	FuEfivars *efivars = fu_context_get_efivars(ctx);
+	gsize data_sz = 0;
+	g_autofree guint8 *data = NULL;
+
+	/* if the bootloader supports installing the capsule updates provided by fwupd, it sets this
+	 * runtime-accessible UEFI variable with a one-byte value of 1 */
+	if (!fu_efivars_get_data(efivars,
+				 FU_EFIVARS_GUID_FWUPDATE,
+				 "BootloaderSupportsFwupd",
+				 &data,
+				 &data_sz,
+				 NULL,
+				 NULL)) {
+		return FALSE;
+	}
+	return data_sz == 1 && data[0] == 1;
 }
 
 static gboolean
@@ -566,6 +593,12 @@ fu_uefi_capsule_device_probe(FuDevice *device, GError **error)
 	    priv->kind == FU_UEFI_CAPSULE_DEVICE_KIND_DELL_TPM_FIRMWARE)
 		fu_device_add_private_flag(device,
 					   FU_UEFI_CAPSULE_DEVICE_FLAG_NO_CAPSULE_HEADER_FIXUP);
+
+	/* if the bootloader doesn't know how to install capsules provided by fwupd,
+	 * enable fwupd-efi */
+	if (!fu_uefi_capsule_device_bootloader_supports_fwupd(device)) {
+		fu_device_add_private_flag(device, FU_UEFI_CAPSULE_DEVICE_FLAG_USE_FWUPD_EFI);
+	}
 
 	/* success */
 	return TRUE;
