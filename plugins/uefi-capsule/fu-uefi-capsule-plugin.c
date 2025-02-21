@@ -553,6 +553,10 @@ fu_uefi_capsule_plugin_load_config(FuPlugin *plugin, FuDevice *device)
 	if (!fu_plugin_get_config_value_boolean(plugin, "DisableShimForSecureBoot"))
 		fu_device_add_private_flag(device, FU_UEFI_CAPSULE_DEVICE_FLAG_USE_SHIM_FOR_SB);
 
+	/* fwupd manages bootloaders or not? */
+	if (fu_plugin_get_config_value_boolean(plugin, "ManageBootloaders"))
+		fu_device_add_private_flag(device, FU_UEFI_CAPSULE_DEVICE_FLAG_MANAGE_BOOTLOADERS);
+
 	/* enable the fwupd.efi debug log? */
 	if (fu_plugin_get_config_value_boolean(plugin, "EnableEfiDebugging"))
 		fu_device_add_private_flag(device, FU_UEFI_CAPSULE_DEVICE_FLAG_ENABLE_DEBUGGING);
@@ -1186,6 +1190,7 @@ fu_uefi_capsule_plugin_modify_config(FuPlugin *plugin,
 			       "DisableShimForSecureBoot",
 			       "EnableEfiDebugging",
 			       "EnableGrubChainLoad",
+			       "ManageBootloaders",
 			       "OverrideESPMountPoint",
 			       "RebootCleanup",
 			       "RequireESPFreeSpace",
@@ -1259,6 +1264,7 @@ fu_uefi_capsule_plugin_constructed(GObject *obj)
 	fu_plugin_set_config_default(plugin, "DisableShimForSecureBoot", "false");
 	fu_plugin_set_config_default(plugin, "EnableEfiDebugging", "false");
 	fu_plugin_set_config_default(plugin, "EnableGrubChainLoad", "false");
+	fu_plugin_set_config_default(plugin, "ManageBootloaders", "true");
 	fu_plugin_set_config_default(plugin, "OverrideESPMountPoint", NULL);
 	fu_plugin_set_config_default(plugin, "RebootCleanup", "true");
 	fu_plugin_set_config_default(plugin, "RequireESPFreeSpace", "0"); /* in MB */

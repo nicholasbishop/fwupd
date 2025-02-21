@@ -231,6 +231,10 @@ The `[uefi_capsule]` section can contain the following parameters:
 
   The shim loader is required to chainload the fwupd EFI binary unless the `fwupd.efi` file has been self-signed manually.
 
+**ManageBootloaders=={{uefi_capsule_ManageBootloaders}}**
+
+  Description TODO
+
 **RequireESPFreeSpace={{uefi_capsule_RequireESPFreeSpace}}**
 
   Amount of free space required on the ESP, for example using `32` for 32Mb.

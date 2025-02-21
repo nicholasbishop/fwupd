@@ -154,6 +154,7 @@ uefi_capsule_modify_config_opts=(
 	'DisableShimForSecureBoot'
 	'EnableEfiDebugging'
 	'EnableGrubChainLoad'
+	'ManageBootloaders'
 	'OverrideESPMountPoint'
 	'RebootCleanup'
 	'RequireESPFreeSpace'

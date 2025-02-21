@@ -6828,6 +6828,7 @@ fu_config_set_plugin_defaults(FuConfig *config)
 	fu_config_set_default(config, "uefi-capsule", "DisableShimForSecureBoot", "false");
 	fu_config_set_default(config, "uefi-capsule", "EnableEfiDebugging", "false");
 	fu_config_set_default(config, "uefi-capsule", "EnableGrubChainLoad", "false");
+	fu_config_set_default(config, "uefi-capsule", "ManageBootloaders", "true");
 	fu_config_set_default(config, "uefi-capsule", "OverrideESPMountPoint", NULL);
 	fu_config_set_default(config, "uefi-capsule", "RebootCleanup", "true");
 	fu_config_set_default(config, "uefi-capsule", "RequireESPFreeSpace", "0");

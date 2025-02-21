@@ -466,6 +466,11 @@ fu_uefi_capsule_device_check_asset(FuUefiCapsuleDevice *self, GError **error)
 
 	if (!fu_efivars_get_secure_boot(efivars, &secureboot_enabled, error))
 		return FALSE;
+
+	if (!fu_device_has_private_flag(self, FU_UEFI_CAPSULE_DEVICE_FLAG_MANAGE_BOOTLOADERS)) {
+		return TRUE;
+	}
+
 	source_app = fu_uefi_get_built_app_path(efivars, "fwupd", error);
 	if (source_app == NULL && secureboot_enabled) {
 		g_prefix_error(error, "missing signed bootloader for secure boot: ");
